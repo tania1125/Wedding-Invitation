@@ -1,65 +1,11 @@
-const music = document.getElementById("bgMusic");
-const startBtn = document.getElementById("startBtn");
-const musicToggle = document.getElementById("musicToggle");
-
-let isPlaying = false;
-
-startBtn.addEventListener("click", async () => {
-
-    try {
-
-        await music.play();
-
-        isPlaying = true;
-
-        musicToggle.innerHTML = "🔊";
-
-        startBtn.innerHTML = "Welcome ❤️";
-
-        document.querySelector(".section")
-            .scrollIntoView({
-                behavior: "smooth"
-            });
-
-    } catch (err) {
-
-        console.log(err);
-
-    }
-
-});
-
-musicToggle.addEventListener("click", async () => {
-
-    try {
-
-        if (isPlaying) {
-
-            music.pause();
-            musicToggle.innerHTML = "🔇";
-
-        } else {
-
-            await music.play();
-            musicToggle.innerHTML = "🔊";
-
-        }
-
-        isPlaying = !isPlaying;
-
-    } catch (err) {
-
-        console.log(err);
-
-    }
-
-});"use strict";
+"use strict";
 
 document.addEventListener("DOMContentLoaded", () => {
     const music = document.getElementById("bgMusic");
     const startBtn = document.getElementById("startBtn");
     const musicToggle = document.getElementById("musicToggle");
     const eventsSection = document.getElementById("events");
+
     const gallerySlider = document.querySelector(".gallery-slider");
     const galleryImages = gallerySlider
         ? Array.from(gallerySlider.querySelectorAll("img"))
@@ -69,7 +15,9 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
     function updateMusicButton(isPlaying) {
-        if (!musicToggle) return;
+        if (!musicToggle) {
+            return;
+        }
 
         musicToggle.textContent = isPlaying ? "🔊" : "🔇";
         musicToggle.setAttribute(
@@ -80,7 +28,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function playMusic() {
-        if (!music) return false;
+        if (!music) {
+            console.error('Audio element with id "bgMusic" was not found.');
+            return false;
+        }
 
         try {
             await music.play();
@@ -99,17 +50,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
             startBtn.textContent = musicStarted
                 ? "Welcome ❤️"
-                : "Welcome ❤️ Music unavailable";
+                : "Welcome ❤️";
             startBtn.disabled = true;
 
-            if (eventsSection) {
-                window.setTimeout(() => {
+            window.setTimeout(() => {
+                if (eventsSection) {
                     eventsSection.scrollIntoView({
                         behavior: "smooth",
                         block: "start"
                     });
-                }, 250);
-            }
+                } else {
+                    document.querySelector(".section")?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start"
+                    });
+                }
+            }, 250);
         });
     }
 
@@ -123,13 +79,22 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        music.addEventListener("play", () => updateMusicButton(true));
-        music.addEventListener("pause", () => updateMusicButton(false));
-        music.addEventListener("ended", () => updateMusicButton(false));
+        music.addEventListener("play", () => {
+            updateMusicButton(true);
+        });
+
+        music.addEventListener("pause", () => {
+            updateMusicButton(false);
+        });
+
+        music.addEventListener("ended", () => {
+            updateMusicButton(false);
+        });
+
         music.addEventListener("error", () => {
             updateMusicButton(false);
             console.error(
-                "The audio file could not be loaded. Check music/wedding-song.mp3."
+                "The audio file could not be loaded. Check that music/wedding-song.mp3 exists."
             );
         });
     }
@@ -139,8 +104,14 @@ document.addEventListener("DOMContentLoaded", () => {
     function setActiveGalleryDot(activeIndex) {
         galleryDots.forEach((dot, index) => {
             const isActive = index === activeIndex;
+
             dot.classList.toggle("active", isActive);
-            dot.setAttribute("aria-current", isActive ? "true" : "false");
+
+            if (isActive) {
+                dot.setAttribute("aria-current", "true");
+            } else {
+                dot.removeAttribute("aria-current");
+            }
         });
     }
 
@@ -154,10 +125,13 @@ document.addEventListener("DOMContentLoaded", () => {
                         .filter((entry) => entry.isIntersecting)
                         .sort(
                             (first, second) =>
-                                second.intersectionRatio - first.intersectionRatio
+                                second.intersectionRatio -
+                                first.intersectionRatio
                         )[0];
 
-                    if (!visibleEntry) return;
+                    if (!visibleEntry) {
+                        return;
+                    }
 
                     const activeIndex = galleryImages.indexOf(
                         visibleEntry.target
@@ -173,16 +147,27 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             );
 
-            galleryImages.forEach((image) => observer.observe(image));
+            galleryImages.forEach((image) => {
+                observer.observe(image);
+            });
         }
 
         galleryDots.forEach((dot, index) => {
             dot.setAttribute("role", "button");
             dot.setAttribute("tabindex", "0");
-            dot.setAttribute("aria-label", `Show gallery photo ${index + 1}`);
+            dot.setAttribute(
+                "aria-label",
+                `Show gallery photo ${index + 1}`
+            );
 
             const showImage = () => {
-                galleryImages[index]?.scrollIntoView({
+                const image = galleryImages[index];
+
+                if (!image) {
+                    return;
+                }
+
+                image.scrollIntoView({
                     behavior: "smooth",
                     block: "nearest",
                     inline: "center"
@@ -190,6 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
             };
 
             dot.addEventListener("click", showImage);
+
             dot.addEventListener("keydown", (event) => {
                 if (event.key === "Enter" || event.key === " ") {
                     event.preventDefault();
