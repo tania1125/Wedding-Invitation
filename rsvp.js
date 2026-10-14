@@ -1,55 +1,105 @@
-alert("RSVP JS LOADED")
 "use strict";
 
 document.addEventListener("DOMContentLoaded", () => {
-    const rsvpForm = document.getElementById("rsvpForm");
-    const rsvpSubmit = document.getElementById("rsvpSubmit");
-    const rsvpStatus = document.getElementById("rsvpStatus");
+    const RSVP_ENDPOINT = "https://script.google.com/macros/s/AKfycbxJDMR7STRFBgikT9f2g4EsBRcOJtAm9TuI0EbATRPRyXG5alcdEuqkoP5ai5ZqnHzZJg/exec";
 
-    const RSVP_ENDPOINT = "https://script.google.com/macros/s/AKfycbx_ap25pjy9whKOxY7LoL9TasW8YpXLijy88Dztnss_dTDUaI4SVNwSivJicSAeceAcDA/exec";
+    const form = document.getElementById("rsvpForm");
+    const submitButton = document.getElementById("rsvpSubmit");
+    const status = document.getElementById("rsvpStatus");
+    const successPanel = document.getElementById("rsvpSuccess");
+    const successTitle = document.getElementById("successTitle");
+    const successMessage = document.getElementById("successMessage");
+    const anotherResponseButton = document.getElementById("editRsvp");
+    const guestCountGroup = document.getElementById("guestCountGroup");
+    const guestCount = document.getElementById("guestCount");
+    const attendanceOptions = Array.from(
+        document.querySelectorAll('input[name="attendance"]')
+    );
 
-    if (!rsvpForm || !rsvpSubmit || !rsvpStatus) {
-        console.error(
-            "RSVP setup error: rsvpForm, rsvpSubmit, or rsvpStatus was not found in index.html."
-        );
+    if (
+        !form ||
+        !submitButton ||
+        !status ||
+        !successPanel ||
+        !successTitle ||
+        !successMessage ||
+        !guestCountGroup ||
+        !guestCount
+    ) {
+        console.error("RSVP setup error: required HTML elements are missing.");
         return;
     }
 
-    rsvpForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
+    function updateGuestCountVisibility() {
+        const selectedAttendance = form.elements.attendance?.value || "";
+        const isUnableToAttend = selectedAttendance === "Unable to Attend";
 
-        if (!rsvpForm.checkValidity()) {
-            rsvpForm.reportValidity();
+        guestCountGroup.hidden = isUnableToAttend;
+        guestCount.disabled = isUnableToAttend;
+        guestCount.required = !isUnableToAttend;
+
+        if (isUnableToAttend) {
+            guestCount.value = "";
+        }
+    }
+
+    attendanceOptions.forEach((option) => {
+        option.addEventListener("change", updateGuestCountVisibility);
+    });
+
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        updateGuestCountVisibility();
+
+        if (!form.checkValidity()) {
+            form.reportValidity();
             return;
         }
 
-        rsvpSubmit.disabled = true;
-        rsvpSubmit.textContent = "Sending...";
-        rsvpStatus.textContent = "";
-        rsvpStatus.className = "rsvp-status";
+        const formData = new FormData(form);
+        const guestName = String(formData.get("name") || "Guest").trim();
+        const attendance = String(formData.get("attendance") || "");
+
+        if (attendance === "Unable to Attend") {
+            formData.set("guestCount", "0");
+        }
+
+        submitButton.disabled = true;
+        submitButton.textContent = "Sending...";
+        status.textContent = "";
+        status.className = "rsvp-status";
 
         try {
-            const formData = new FormData(rsvpForm);
-
             await fetch(RSVP_ENDPOINT, {
                 method: "POST",
                 mode: "no-cors",
                 body: formData
             });
 
-            const guestName = String(formData.get("name") || "Guest").trim();
+            form.hidden = true;
+            successPanel.hidden = false;
+            successTitle.textContent = `Thank you, ${guestName}`;
+            successMessage.textContent =
+                attendance === "Unable to Attend"
+                    ? "We will miss you. Your response has been recorded."
+                    : "Your RSVP has been recorded. We look forward to celebrating with you.";
 
-            rsvpForm.reset();
-            rsvpStatus.textContent = `Thank you, ${guestName}. Your RSVP has been sent.`;
-            rsvpStatus.classList.add("success");
+            form.reset();
+            updateGuestCountVisibility();
         } catch (error) {
             console.error("RSVP submission failed:", error);
-            rsvpStatus.textContent =
+            status.textContent =
                 "We could not send your RSVP. Please check your connection and try again.";
-            rsvpStatus.classList.add("error");
+            status.classList.add("error");
         } finally {
-            rsvpSubmit.disabled = false;
-            rsvpSubmit.textContent = "Send RSVP";
+            submitButton.disabled = false;
+            submitButton.textContent = "Send RSVP";
         }
+    });
+
+    anotherResponseButton?.addEventListener("click", () => {
+        successPanel.hidden = true;
+        form.hidden = false;
+        document.getElementById("guestName")?.focus();
     });
 });

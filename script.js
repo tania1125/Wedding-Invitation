@@ -5,20 +5,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const startBtn = document.getElementById("startBtn");
     const musicToggle = document.getElementById("musicToggle");
     const eventsSection = document.getElementById("events");
-
+    const siteNav = document.getElementById("siteNav");
     const gallerySlider = document.querySelector(".gallery-slider");
     const galleryImages = gallerySlider
         ? Array.from(gallerySlider.querySelectorAll("img"))
         : [];
     const galleryDots = Array.from(
-        document.querySelectorAll(".gallery-dots span")
+        document.querySelectorAll(".gallery-dots button")
     );
+    const galleryHint = document.querySelector(".gallery-hint");
 
     function updateMusicButton(isPlaying) {
-        if (!musicToggle) {
-            return;
-        }
-
+        if (!musicToggle) return;
         musicToggle.textContent = isPlaying ? "🔊" : "🔇";
         musicToggle.setAttribute(
             "aria-label",
@@ -44,67 +42,45 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    if (startBtn) {
-        startBtn.addEventListener("click", async () => {
-            const musicStarted = await playMusic();
+    startBtn?.addEventListener("click", async () => {
+        await playMusic();
+        startBtn.textContent = "Welcome ❤️";
+        startBtn.disabled = true;
+        siteNav?.classList.add("visible");
 
-            startBtn.textContent = musicStarted
-                ? "Welcome ❤️"
-                : "Welcome ❤️";
-            startBtn.disabled = true;
+        window.setTimeout(() => {
+            eventsSection?.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }, 250);
+    });
 
-            window.setTimeout(() => {
-                if (eventsSection) {
-                    eventsSection.scrollIntoView({
-                        behavior: "smooth",
-                        block: "start"
-                    });
-                } else {
-                    document.querySelector(".section")?.scrollIntoView({
-                        behavior: "smooth",
-                        block: "start"
-                    });
-                }
-            }, 250);
-        });
-    }
+    musicToggle?.addEventListener("click", async () => {
+        if (!music) return;
 
-    if (musicToggle && music) {
-        musicToggle.addEventListener("click", async () => {
-            if (music.paused) {
-                await playMusic();
-            } else {
-                music.pause();
-                updateMusicButton(false);
-            }
-        });
+        if (music.paused) {
+            await playMusic();
+        } else {
+            music.pause();
+        }
+    });
 
-        music.addEventListener("play", () => {
-            updateMusicButton(true);
-        });
-
-        music.addEventListener("pause", () => {
-            updateMusicButton(false);
-        });
-
-        music.addEventListener("ended", () => {
-            updateMusicButton(false);
-        });
-
-        music.addEventListener("error", () => {
-            updateMusicButton(false);
-            console.error(
-                "The audio file could not be loaded. Check that music/wedding-song.mp3 exists."
-            );
-        });
-    }
+    music?.addEventListener("play", () => updateMusicButton(true));
+    music?.addEventListener("pause", () => updateMusicButton(false));
+    music?.addEventListener("ended", () => updateMusicButton(false));
+    music?.addEventListener("error", () => {
+        updateMusicButton(false);
+        console.error(
+            "The audio file could not be loaded. Confirm music/wedding-song.mp3 exists."
+        );
+    });
 
     updateMusicButton(Boolean(music && !music.paused));
 
     function setActiveGalleryDot(activeIndex) {
         galleryDots.forEach((dot, index) => {
             const isActive = index === activeIndex;
-
             dot.classList.toggle("active", isActive);
 
             if (isActive) {
@@ -115,11 +91,27 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    let galleryHintHidden = false;
+
+    function hideGalleryHint() {
+        if (galleryHintHidden || !galleryHint) return;
+        galleryHintHidden = true;
+        galleryHint.classList.add("hidden");
+    }
+
     if (gallerySlider && galleryImages.length > 0) {
         setActiveGalleryDot(0);
 
+        gallerySlider.addEventListener("pointerdown", hideGalleryHint, {
+            once: true
+        });
+        gallerySlider.addEventListener("scroll", hideGalleryHint, {
+            once: true,
+            passive: true
+        });
+
         if ("IntersectionObserver" in window) {
-            const observer = new IntersectionObserver(
+            const galleryObserver = new IntersectionObserver(
                 (entries) => {
                     const visibleEntry = entries
                         .filter((entry) => entry.isIntersecting)
@@ -129,9 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 first.intersectionRatio
                         )[0];
 
-                    if (!visibleEntry) {
-                        return;
-                    }
+                    if (!visibleEntry) return;
 
                     const activeIndex = galleryImages.indexOf(
                         visibleEntry.target
@@ -143,45 +133,55 @@ document.addEventListener("DOMContentLoaded", () => {
                 },
                 {
                     root: gallerySlider,
-                    threshold: [0.5, 0.65, 0.8]
+                    threshold: [0.55, 0.75]
                 }
             );
 
             galleryImages.forEach((image) => {
-                observer.observe(image);
+                galleryObserver.observe(image);
             });
         }
 
         galleryDots.forEach((dot, index) => {
-            dot.setAttribute("role", "button");
-            dot.setAttribute("tabindex", "0");
-            dot.setAttribute(
-                "aria-label",
-                `Show gallery photo ${index + 1}`
-            );
-
-            const showImage = () => {
+            dot.addEventListener("click", () => {
                 const image = galleryImages[index];
+                if (!image) return;
 
-                if (!image) {
-                    return;
-                }
-
+                hideGalleryHint();
+                setActiveGalleryDot(index);
                 image.scrollIntoView({
                     behavior: "smooth",
                     block: "nearest",
                     inline: "center"
                 });
-            };
-
-            dot.addEventListener("click", showImage);
-
-            dot.addEventListener("keydown", (event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    showImage();
-                }
             });
+        });
+    }
+
+    const revealElements = Array.from(
+        document.querySelectorAll(".reveal")
+    );
+
+    if ("IntersectionObserver" in window) {
+        const revealObserver = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (!entry.isIntersecting) return;
+                    entry.target.classList.add("revealed");
+                    revealObserver.unobserve(entry.target);
+                });
+            },
+            {
+                threshold: 0.12
+            }
+        );
+
+        revealElements.forEach((element) => {
+            revealObserver.observe(element);
+        });
+    } else {
+        revealElements.forEach((element) => {
+            element.classList.add("revealed");
         });
     }
 });
