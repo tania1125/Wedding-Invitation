@@ -89,10 +89,10 @@
     <p class="section-eyebrow">
      Save the dates
     </p>
-    <h2 class="section-title">
+    <h2 class="section-title" id="scheduleTitle">
      Celebration Schedule
     </h2>
-    <article class="event-card reveal">
+    <article class="event-card reveal" data-event="betrothal">
      <header class="event-heading">
       <span aria-hidden="true" class="event-icon">
        <svg viewbox="0 0 24 24">
@@ -150,7 +150,7 @@
       </a>
      </div>
     </article>
-    <article class="event-card reveal">
+    <article class="event-card reveal" data-event="madhuramveppu">
      <header class="event-heading">
       <span aria-hidden="true" class="event-icon">
        <svg viewbox="0 0 24 24">
@@ -176,7 +176,7 @@
        Colour Theme
       </span>
       <strong>
-       Royal Blue • Dark Green • Beige 
+       Royal Blue • Dark Green • Beige
       </strong>
       <div aria-label="Royal blue, dark green and beige colours" class="swatches">
        <span class="swatch royal-blue">
@@ -208,7 +208,7 @@
       </a>
      </div>
     </article>
-    <article class="event-card reveal">
+    <article class="event-card reveal" data-event="wedding">
      <header class="event-heading">
       <span aria-hidden="true" class="event-icon">
        <svg viewbox="0 0 24 24">
@@ -229,49 +229,35 @@
        </p>
       </div>
      </header>
-    <div class="buttons wedding-buttons">
-
-        <a
-            href="PASTE_CHURCH_GOOGLE_MAPS_LINK_HERE"
-            rel="noopener noreferrer" target="_blank">
-                <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"></path>
-                <circle cx="12" cy="10" r="2.5"></circle>
-            </svg>
-
-            Church Location
-        </a>
-
-        <a href="https://maps.app.goo.gl/XLrDvD3gDkbUM5b16" x="0 0 24 24" rel="noopener noreferrer" target="_blank">
-                <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"></path>
-                <circle cx="12" cy="10" r="2.5"></circle>
-            </svg>
-
-            Reception Location
-        </a>
-
-        <a
-            class="wedding-calendar-button"
-            href="https://calendar.google.com/calendar/r/eventedit?action=TEMPLATE&amp;text=Wedding%20and%20Reception%20-%20Tessa%20and%20Shen&amp;dates=20270102T153000/20270102T200000&amp;ctz=Asia%2FKolkata&amp;details=Join%20us%20for%20the%20Wedding%20and%20Reception%20of%20Tessa%20and%20Shen"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Add Wedding and Reception to Google Calendar"
-        >
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-                <rect
-                    x="3"
-                    y="5"
-                    width="18"
-                    height="16"
-                    rx="2"
-                ></rect>
-
-                <path d="M16 3v4M8 3v4M3 10h18M12 14v4M10 16h4"></path>
-            </svg>
-
-            Add to Calendar
-        </a>
-
-    </div>
+     <div class="buttons wedding-buttons">
+      <a aria-label="Open Church location in a new tab" href="PASTE_CHURCH_GOOGLE_MAPS_LINK_HERE" rel="noopener noreferrer" target="_blank">
+       <svg aria-hidden="true" viewbox="0 0 24 24">
+        <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z">
+        </path>
+        <circle cx="12" cy="10" r="2.5">
+        </circle>
+       </svg>
+       Church Location
+      </a>
+      <a aria-label="Open Reception location in a new tab" href="https://maps.app.goo.gl/XLrDvD3gDkbUM5b16" rel="noopener noreferrer" target="_blank">
+       <svg aria-hidden="true" viewbox="0 0 24 24">
+        <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z">
+        </path>
+        <circle cx="12" cy="10" r="2.5">
+        </circle>
+       </svg>
+       Reception Location
+      </a>
+      <a aria-label="Add Wedding and Reception to Google Calendar" class="wedding-calendar-button" href="https://calendar.google.com/calendar/r/eventedit?action=TEMPLATE&amp;text=Wedding%20and%20Reception%20-%20Tessa%20and%20Shen&amp;dates=20270102T153000/20270102T200000&amp;ctz=Asia%2FKolkata&amp;details=Join%20us%20for%20the%20Wedding%20and%20Reception%20of%20Tessa%20and%20Shen" rel="noopener noreferrer" target="_blank">
+       <svg aria-hidden="true" viewbox="0 0 24 24">
+        <rect height="16" rx="2" width="18" x="3" y="5">
+        </rect>
+        <path d="M16 3v4M8 3v4M3 10h18M12 14v4M10 16h4">
+        </path>
+       </svg>
+       Add to Calendar
+      </a>
+     </div>
     </article>
    </section>
    <section class="section reveal" id="gallery">
@@ -308,13 +294,15 @@
     <h2 class="section-title">
      RSVP
     </h2>
-    <p class="rsvp-intro">
+    <p class="rsvp-intro" id="rsvpIntro">
      We would be delighted to celebrate with you.
     </p>
     <div class="rsvp-panel" id="rsvpPanel">
      <form class="rsvp-card" id="rsvpForm" novalidate="">
       <!-- Basic spam protection -->
       <input aria-hidden="true" autocomplete="off" class="honeypot" name="website" tabindex="-1" type="text"/>
+      <input id="invitationType" name="invitationType" type="hidden" value="All Events"/>
+      <input id="invitedEvents" name="invitedEvents" type="hidden" value="Betrothal, Madhuramveppu, Wedding and Reception"/>
       <div class="form-group">
        <label for="guestName">
         Your Name
@@ -370,6 +358,21 @@
          7 Guests
         </option>
        </select>
+      </div>
+      <div class="form-group message-group">
+       <label for="wishesMessage">
+        Wishes or Message
+        <span class="optional-label">
+         Optional
+        </span>
+       </label>
+       <textarea id="wishesMessage" maxlength="500" name="message" placeholder="Share your wishes or a message for Tessa and Shen" rows="4"></textarea>
+       <small class="field-help">
+        <span id="messageCount">
+         0
+        </span>
+        /500 characters
+       </small>
       </div>
       <button class="rsvp-submit" id="rsvpSubmit" type="submit">
        Send RSVP
