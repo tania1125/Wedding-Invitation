@@ -311,7 +311,7 @@ button {
     gap: clamp(14px, 3vw, 22px);
     width: 100%;
     overflow-x: auto;
-    overflow-y: hidden;
+    overflow-y: visible;
     padding: 4px max(4px, calc((100% - min(82vw, 420px)) / 2)) 20px;
     scroll-snap-type: x mandatory;
     scroll-padding-inline: max(4px, calc((100% - min(82vw, 420px)) / 2));
@@ -319,7 +319,9 @@ button {
     scrollbar-width: none;
     -ms-overflow-style: none;
     -webkit-overflow-scrolling: touch;
-    touch-action: pan-x;
+    touch-action: pan-x pan-y pinch-zoom;
+    overscroll-behavior-x: contain;
+    overscroll-behavior-y: auto;
 }
 
 .gallery-slider::-webkit-scrollbar {
@@ -364,6 +366,7 @@ button {
     border-radius: 999px;
     background: var(--gold-dark);
 }
+
 /* =========================
    COMPACT RSVP
 ========================= */
@@ -705,8 +708,16 @@ button {
     }
 
     .gallery-slider img {
-        width: 84vw;
-        max-width: 360px;
+    width: min(76vw, 330px);
+    height: min(66svh, 500px);
+    max-height: 500px;
+
+    flex: 0 0 auto;
+
+    object-fit: cover;
+    object-position: center;
+
+    scroll-snap-align: center;
     }
 
     .rsvp-form-wrapper {
@@ -741,7 +752,8 @@ button {
     }
 
     .gallery-slider img {
-        width: 86vw;
+        width: 74vw;
+        height: min(62svh, 430px);
     }
 }
 
