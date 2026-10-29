@@ -324,6 +324,17 @@ button {
     overscroll-behavior-y: auto;
 }
 
+.gallery-slider img.landscape-photo {
+    object-fit: contain;
+    object-position: center;
+    padding: 10px;
+    background: linear-gradient(
+        145deg,
+        #f7f1e8,
+        #eee3d4
+    );
+}
+
 .gallery-slider::-webkit-scrollbar {
     display: none;
 }
