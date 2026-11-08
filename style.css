@@ -337,11 +337,9 @@ button {
     object-fit: contain;
     object-position: center;
     padding: 10px;
-    background: linear-gradient(
-        145deg,
-        #f7f1e8,
-        #eee3d4
-    );
+    background: linear-gradient(145deg,
+            #f7f1e8,
+            #eee3d4);
 }
 
 .gallery-slider::-webkit-scrollbar {
@@ -776,6 +774,22 @@ button {
         width: 74vw;
         height: min(62svh, 430px);
     }
+
+    .theme-palette {
+        gap: 8px 11px;
+        font-size: 1rem;
+    }
+
+    .theme-palette .swatch {
+        width: 17px;
+        height: 17px;
+    }
+
+    .palette-item {
+        gap: 5px;
+    }
+
+
 }
 
 /* =========================
@@ -1022,33 +1036,53 @@ button {
     font-size: 0.92rem;
 }
 
-.muted-theme {
-    opacity: 0.82;
-}
-
-.swatches {
+.theme-palette {
     display: flex;
-    gap: 7px;
-    margin-top: 9px;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+
+    margin-top: 5px;
+
+    color: var(--text);
+
+    font-size: 1.08rem;
+    font-weight: 600;
+    line-height: 1.3;
 }
 
-.swatch {
-    width: 18px;
-    height: 18px;
-    border: 2px solid #ffffff;
+.palette-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    white-space: nowrap;
+}
+
+.theme-palette .swatch {
+    display: inline-block;
+    flex: 0 0 auto;
+
+    width: 19px;
+    height: 19px;
+
+    border: 1.5px solid #988873;
     border-radius: 50%;
-    box-shadow: 0 0 0 1px rgba(45, 42, 38, 0.12);
+
+    box-shadow:
+        0 1px 3px rgba(45, 42, 38, 0.14),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.4);
 }
 
-.royal-blue {
+.theme-palette .royal-blue {
     background: #1d3f86;
 }
 
-.dark-green {
+.theme-palette .dark-green {
     background: #224f3d;
 }
 
-.beige {
+.theme-palette .beige {
     background: #d8c49f;
 }
 
